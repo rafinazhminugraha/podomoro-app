@@ -1,6 +1,7 @@
 'use client';
 
 import { TimerStatus, TimerState } from '@/types';
+import { PlayCircle, PauseCircle, RotateCcw } from 'lucide-react';
 
 interface TimerControlsProps {
   timerStatus: TimerStatus;
@@ -47,7 +48,7 @@ export function TimerControls({
           `}
           title="Start Focus"
         >
-          <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" />
+          <PlayCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" strokeWidth={1.5} />
         </button>
       </div>
     );
@@ -65,7 +66,7 @@ export function TimerControls({
           `}
           title="Pause"
         >
-          <PauseIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" />
+          <PauseCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" strokeWidth={1.5} />
         </button>
         
         <button
@@ -76,7 +77,7 @@ export function TimerControls({
           `}
           title="Reset"
         >
-          <ResetIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white/50" />
+          <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white/50" strokeWidth={1.5} />
         </button>
       </div>
     );
@@ -94,7 +95,7 @@ export function TimerControls({
           `}
           title="Resume"
         >
-          <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" />
+          <PlayCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" strokeWidth={1.5} />
         </button>
         
         <button
@@ -105,7 +106,7 @@ export function TimerControls({
           `}
           title="Reset"
         >
-          <ResetIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white/50" />
+          <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white/50" strokeWidth={1.5} />
         </button>
       </div>
     );
@@ -114,48 +115,3 @@ export function TimerControls({
   return null;
 }
 
-// Icon Components - Refined, lighter strokes
-function PlayIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={1.5} 
-        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" 
-      />
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={1.5} 
-        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
-      />
-    </svg>
-  );
-}
-
-function PauseIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={1.5} 
-        d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" 
-      />
-    </svg>
-  );
-}
-
-function ResetIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={1.5} 
-        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
-      />
-    </svg>
-  );
-}

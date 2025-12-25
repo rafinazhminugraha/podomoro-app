@@ -1,5 +1,7 @@
 'use client';
 
+import { Music, VolumeX } from 'lucide-react';
+
 interface SettingsPanelProps {
   isMusicEnabled: boolean;
   onToggleMusic: () => void;
@@ -33,46 +35,17 @@ export function SettingsPanel({
       `}
       title={isMusicEnabled ? 'Mute Music' : 'Unmute Music'}
     >
-      <MusicIcon enabled={isMusicEnabled} />
-    </button>
-  );
-}
-
-interface MusicIconProps {
-  enabled: boolean;
-}
-
-function MusicIcon({ enabled }: MusicIconProps) {
-  return (
-    <svg
-      className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-colors duration-300 ${enabled ? 'text-white/80' : 'text-white/40'}`}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      {enabled ? (
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
+      {isMusicEnabled ? (
+        <Music 
+          className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white/80 transition-colors duration-300" 
           strokeWidth={1.5} 
-          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" 
         />
       ) : (
-        <>
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={1.5} 
-            d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" 
-          />
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={1.5} 
-            d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" 
-          />
-        </>
+        <VolumeX 
+          className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white/40 transition-colors duration-300" 
+          strokeWidth={1.5} 
+        />
       )}
-    </svg>
+    </button>
   );
 }

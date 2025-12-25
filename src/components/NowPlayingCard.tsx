@@ -1,5 +1,6 @@
 'use client';
 
+import { VolumeX, Youtube, ExternalLink } from 'lucide-react';
 import { TimerState, TimerStatus } from '@/types';
 
 interface NowPlayingCardProps {
@@ -49,7 +50,7 @@ export function NowPlayingCard({ timerState, timerStatus, isMusicEnabled }: NowP
             <span className="w-0.5 h-2.5 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '450ms' }} />
           </div>
         ) : (
-          <MutedIcon />
+          <VolumeX className="w-3 h-3 text-white/35" strokeWidth={1.5} />
         )}
         <span className="text-[9px] sm:text-[10px] font-medium text-white/35 uppercase tracking-wider">
           {isPlaying ? 'Now Playing' : 'Muted'}
@@ -79,36 +80,12 @@ export function NowPlayingCard({ timerState, timerStatus, isMusicEnabled }: NowP
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-[9px] sm:text-[10px] text-white/30 hover:text-white/50 transition-colors cursor-pointer"
         >
-          <YoutubeIcon />
+          <Youtube className="w-3 h-3" />
           <span>View on YouTube</span>
-          <ExternalLinkIcon />
+          <ExternalLink className="w-2.5 h-2.5 ml-auto opacity-50" strokeWidth={1.5} />
         </a>
       )}
     </div>
   );
 }
 
-function MutedIcon() {
-  return (
-    <svg className="w-3 h-3 text-white/35" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-    </svg>
-  );
-}
-
-function YoutubeIcon() {
-  return (
-    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-    </svg>
-  );
-}
-
-function ExternalLinkIcon() {
-  return (
-    <svg className="w-2.5 h-2.5 ml-auto opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-    </svg>
-  );
-}

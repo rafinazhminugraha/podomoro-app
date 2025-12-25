@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Plus, Minus } from 'lucide-react';
 import { PomodoroTemplate } from '@/types';
 import { POMODORO_TEMPLATES } from '@/data/templates';
 
@@ -150,7 +151,7 @@ export function ModeSelector({
                               text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
                               flex items-center justify-center outline-none active:scale-90 transition-all"
                     >
-                      <MinusIcon />
+                      <Minus className="w-3 h-3" strokeWidth={1.5} />
                     </button>
                     <input
                       type="number"
@@ -168,7 +169,7 @@ export function ModeSelector({
                               text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
                               flex items-center justify-center outline-none active:scale-90 transition-all"
                     >
-                      <PlusIcon />
+                      <Plus className="w-3 h-3" strokeWidth={1.5} />
                     </button>
                   </div>
                 </div>
@@ -183,7 +184,7 @@ export function ModeSelector({
                               text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
                               flex items-center justify-center outline-none active:scale-90 transition-all"
                     >
-                      <MinusIcon />
+                      <Minus className="w-3 h-3" strokeWidth={1.5} />
                     </button>
                     <input
                       type="number"
@@ -201,7 +202,7 @@ export function ModeSelector({
                               text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
                               flex items-center justify-center outline-none active:scale-90 transition-all"
                     >
-                      <PlusIcon />
+                      <Plus className="w-3 h-3" strokeWidth={1.5} />
                     </button>
                   </div>
                 </div>
@@ -294,7 +295,7 @@ export function ModeSelector({
                            text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
                            flex items-center justify-center outline-none active:scale-90 transition-all"
                 >
-                  <MinusIcon />
+                  <Minus className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
                 </button>
                 <input
                   type="number"
@@ -312,7 +313,7 @@ export function ModeSelector({
                            text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
                            flex items-center justify-center outline-none active:scale-90 transition-all"
                 >
-                  <PlusIcon />
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
                 </button>
               </div>
             </div>
@@ -327,7 +328,7 @@ export function ModeSelector({
                            text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
                            flex items-center justify-center outline-none active:scale-90 transition-all"
                 >
-                  <MinusIcon />
+                  <Minus className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
                 </button>
                 <input
                   type="number"
@@ -345,7 +346,7 @@ export function ModeSelector({
                            text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
                            flex items-center justify-center outline-none active:scale-90 transition-all"
                 >
-                  <PlusIcon />
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
                 </button>
               </div>
             </div>
@@ -353,21 +354,5 @@ export function ModeSelector({
         )}
       </div>
     </div>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v12m6-6H6" />
-    </svg>
-  );
-}
-
-function MinusIcon() {
-  return (
-    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 12H6" />
-    </svg>
   );
 }
