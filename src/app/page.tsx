@@ -50,13 +50,13 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#09090b]">
-      {/* Symmetric Gradient Orbs - Horizontally Aligned */}
+      {/* Symmetric Gradient Orbs - Responsive */}
       <div 
         className={`
           fixed left-0 top-1/2 -translate-y-1/2 -translate-x-1/2
-          w-150 h-150 rounded-full
-          blur-[120px] pointer-events-none
-          transition-all duration-1000 ease-out
+          w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]
+          rounded-full blur-[80px] sm:blur-[100px] md:blur-[120px]
+          pointer-events-none transition-all duration-1000 ease-out
           ${timerState === 'focus' ? 'bg-rose-500/20' : 
             timerState === 'break' ? 'bg-emerald-500/20' : 'bg-white/15'}
         `}
@@ -64,9 +64,9 @@ export default function HomePage() {
       <div 
         className={`
           fixed right-0 top-1/2 -translate-y-1/2 translate-x-1/2
-          w-150 h-150 rounded-full
-          blur-[120px] pointer-events-none
-          transition-all duration-1000 ease-out
+          w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]
+          rounded-full blur-[80px] sm:blur-[100px] md:blur-[120px]
+          pointer-events-none transition-all duration-1000 ease-out
           ${timerState === 'focus' ? 'bg-rose-500/20' : 
             timerState === 'break' ? 'bg-emerald-500/20' : 'bg-white/15'}
         `}
@@ -76,11 +76,11 @@ export default function HomePage() {
       <div className="fixed inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
 
       {/* Top - Motivational Message */}
-      <div className="fixed top-16 left-0 right-0 flex flex-col items-center z-10 pointer-events-none">
-        <h1 className="text-2xl font-bold text-white tracking-wide transition-all duration-500">
+      <div className="fixed top-8 sm:top-12 md:top-16 left-0 right-0 flex flex-col items-center z-10 pointer-events-none px-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-wide transition-all duration-500 text-center">
           {motivation.title}
         </h1>
-        <p className="mt-2 text-sm text-white/40 tracking-wider">
+        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-white/40 tracking-wider text-center">
           {motivation.subtitle}
         </p>
       </div>
@@ -98,15 +98,17 @@ export default function HomePage() {
       </div>
 
       {/* Bottom - Session Counter */}
-      <div className="fixed bottom-16 left-0 right-0 flex justify-center z-10 pointer-events-none">
+      <div className="fixed bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex justify-center z-10 pointer-events-none">
         <SessionCounter sessionsCompleted={sessionsCompleted} />
       </div>
 
-      {/* Left Panel - Mode Selector (Fixed Position) */}
+      {/* Left Panel - Mode Selector (Hidden on mobile, shown on tablet+) */}
       <aside 
         className={`
-          fixed left-40 top-1/2 -translate-y-1/2 z-20
+          fixed left-4 sm:left-6 md:left-10 lg:left-16 xl:left-24 2xl:left-40
+          top-1/2 -translate-y-1/2 z-20
           transition-all duration-500
+          hidden md:block
           ${isTimerActive ? 'opacity-30 pointer-events-none' : 'opacity-100'}
         `}
       >
@@ -118,9 +120,9 @@ export default function HomePage() {
         />
       </aside>
 
-      {/* Right Panel - Controls (Fixed Position) */}
-      <aside className="fixed right-40 top-1/2 -translate-y-1/2 z-20">
-        <div className="flex flex-col gap-4">
+      {/* Right Panel - Controls */}
+      <aside className="fixed right-4 sm:right-6 md:right-10 lg:right-16 xl:right-24 2xl:right-40 top-1/2 -translate-y-1/2 z-20">
+        <div className="flex flex-col gap-3 sm:gap-4">
           <TimerControls
             timerStatus={timerStatus}
             timerState={timerState}
@@ -137,8 +139,30 @@ export default function HomePage() {
         </div>
       </aside>
 
-      {/* Bottom Right - Now Playing Card */}
-      <div className="fixed bottom-8 right-8 z-20">
+      {/* Mobile Mode Selector - Bottom Sheet style (visible only on mobile) */}
+      <div 
+        className={`
+          fixed bottom-0 left-0 right-0 z-30 md:hidden
+          bg-[#09090b]/95 backdrop-blur-lg border-t border-white/10
+          transition-all duration-500
+          ${isTimerActive ? 'translate-y-full' : 'translate-y-0'}
+        `}
+      >
+        <div className="px-4 py-4 overflow-x-auto">
+          <div className="flex gap-3 pb-2">
+            <ModeSelector
+              selectedTemplate={currentTemplate}
+              onSelectTemplate={selectTemplate}
+              onCustomDurations={setCustomDurations}
+              disabled={isTimerActive}
+              horizontal
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Right - Now Playing Card (Hidden on small screens) */}
+      <div className="fixed bottom-4 sm:bottom-6 md:bottom-8 right-4 sm:right-6 md:right-8 z-20 hidden sm:block">
         <NowPlayingCard
           timerState={timerState}
           timerStatus={timerStatus}

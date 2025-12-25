@@ -23,7 +23,8 @@ export function TimerControls({
 }: TimerControlsProps) {
 
   const iconButtonClasses = `
-    group relative w-16 h-16 rounded-xl border transition-all duration-300
+    group relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 
+    rounded-xl border transition-all duration-300
     flex items-center justify-center cursor-pointer
     outline-none
     disabled:opacity-30 disabled:cursor-not-allowed
@@ -33,7 +34,7 @@ export function TimerControls({
   // Idle state - show Start button
   if (timerStatus === 'idle') {
     return (
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 sm:gap-3">
         <button
           onClick={onStart}
           disabled={!hasTemplate}
@@ -46,7 +47,7 @@ export function TimerControls({
           `}
           title="Start Focus"
         >
-          <PlayIcon className="w-7 h-7 text-white/80" />
+          <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" />
         </button>
       </div>
     );
@@ -55,7 +56,7 @@ export function TimerControls({
   // Running state - show Pause and Reset buttons
   if (timerStatus === 'running') {
     return (
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 sm:gap-3">
         <button
           onClick={onPause}
           className={`
@@ -64,7 +65,7 @@ export function TimerControls({
           `}
           title="Pause"
         >
-          <PauseIcon className="w-7 h-7 text-white/80" />
+          <PauseIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" />
         </button>
         
         <button
@@ -75,7 +76,7 @@ export function TimerControls({
           `}
           title="Reset"
         >
-          <ResetIcon className="w-6 h-6 text-white/50" />
+          <ResetIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white/50" />
         </button>
       </div>
     );
@@ -84,7 +85,7 @@ export function TimerControls({
   // Paused state - show Resume and Reset buttons
   if (timerStatus === 'paused') {
     return (
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 sm:gap-3">
         <button
           onClick={onResume}
           className={`
@@ -93,7 +94,7 @@ export function TimerControls({
           `}
           title="Resume"
         >
-          <PlayIcon className="w-7 h-7 text-white/80" />
+          <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white/80" />
         </button>
         
         <button
@@ -104,7 +105,7 @@ export function TimerControls({
           `}
           title="Reset"
         >
-          <ResetIcon className="w-6 h-6 text-white/50" />
+          <ResetIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white/50" />
         </button>
       </div>
     );

@@ -34,11 +34,11 @@ export function TimerDisplay({
 
   return (
     <div className="relative flex flex-col items-center justify-center">
-      {/* Circular Progress */}
-      <div className="relative w-72 h-72">
+      {/* Circular Progress - Responsive sizes */}
+      <div className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72">
         {/* Subtle glow effect - always visible */}
         <div 
-          className="absolute inset-4 rounded-full blur-2xl opacity-15 transition-all duration-1000"
+          className="absolute inset-3 sm:inset-4 rounded-full blur-xl sm:blur-2xl opacity-15 transition-all duration-1000"
           style={{ backgroundColor: timerState === 'idle' ? '#ffffff' : stateColor }}
         />
         
@@ -74,33 +74,33 @@ export function TimerDisplay({
         </svg>
 
         {/* Timer Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5">
           {/* State Label */}
           <span 
-            className="text-xs font-medium tracking-[0.2em] uppercase transition-colors duration-500"
+            className="text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase transition-colors duration-500"
             style={{ color: timerStatus !== 'idle' ? stateColor : 'rgba(255,255,255,0.4)' }}
           >
             {getStateLabel()}
           </span>
           
           {/* Time Display - Centered anchor */}
-          <span className="text-5xl font-extralight tracking-tight text-white font-mono tabular-nums">
+          <span className="text-4xl sm:text-5xl md:text-5xl font-extralight tracking-tight text-white font-mono tabular-nums">
             {formatTime(timeRemaining)}
           </span>
           
           {/* Status Indicator */}
           {timerStatus !== 'idle' ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <span 
-                className={`w-1.5 h-1.5 rounded-full ${timerStatus === 'running' ? 'animate-pulse' : ''}`}
+                className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${timerStatus === 'running' ? 'animate-pulse' : ''}`}
                 style={{ backgroundColor: timerStatus === 'paused' ? 'rgba(255,255,255,0.4)' : stateColor }}
               />
-              <span className="text-xs text-white/40 uppercase tracking-wider">
+              <span className="text-[10px] sm:text-xs text-white/40 uppercase tracking-wider">
                 {timerStatus === 'paused' ? 'Paused' : timerState === 'focus' ? 'Focusing' : 'Resting'}
               </span>
             </div>
           ) : (
-            <div className="h-5" /> 
+            <div className="h-4 sm:h-5" /> 
           )}
         </div>
       </div>

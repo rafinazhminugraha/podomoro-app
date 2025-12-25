@@ -12,7 +12,8 @@ export function SettingsPanel({
   disabled = false,
 }: SettingsPanelProps) {
   const iconButtonClasses = `
-    group relative w-16 h-16 rounded-xl border transition-all duration-300
+    group relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 
+    rounded-xl border transition-all duration-300
     flex items-center justify-center cursor-pointer
     outline-none
     disabled:opacity-30 disabled:cursor-not-allowed
@@ -44,7 +45,7 @@ interface MusicIconProps {
 function MusicIcon({ enabled }: MusicIconProps) {
   return (
     <svg
-      className={`w-6 h-6 transition-colors duration-300 ${enabled ? 'text-white/80' : 'text-white/40'}`}
+      className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-colors duration-300 ${enabled ? 'text-white/80' : 'text-white/40'}`}
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

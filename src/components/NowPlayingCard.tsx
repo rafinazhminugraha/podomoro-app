@@ -33,45 +33,43 @@ export function NowPlayingCard({ timerState, timerStatus, isMusicEnabled }: NowP
 
   return (
     <div 
-      className="rounded-xl border transition-all duration-300"
+      className="rounded-xl border transition-all duration-300 w-44 sm:w-48 md:w-52 px-3 py-2.5 sm:px-4 sm:py-3 md:px-4 md:py-3.5"
       style={{
-        width: '200px',
-        padding: '14px 16px',
         backgroundColor: 'rgba(255, 255, 255, 0.03)',
         borderColor: 'rgba(255, 255, 255, 0.08)',
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+      <div className="flex items-center gap-2 mb-2 sm:mb-2.5 md:mb-3">
         {isPlaying ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-            <span style={{ width: '2px', height: '8px', backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: '1px' }} className="animate-pulse" />
-            <span style={{ width: '2px', height: '12px', backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: '1px' }} className="animate-pulse" />
-            <span style={{ width: '2px', height: '6px', backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: '1px' }} className="animate-pulse" />
-            <span style={{ width: '2px', height: '10px', backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: '1px' }} className="animate-pulse" />
+          <div className="flex items-center gap-0.5">
+            <span className="w-0.5 h-2 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
+            <span className="w-0.5 h-3 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+            <span className="w-0.5 h-1.5 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+            <span className="w-0.5 h-2.5 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '450ms' }} />
           </div>
         ) : (
           <MutedIcon />
         )}
-        <span style={{ fontSize: '10px', fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <span className="text-[9px] sm:text-[10px] font-medium text-white/35 uppercase tracking-wider">
           {isPlaying ? 'Now Playing' : 'Muted'}
         </span>
       </div>
 
       {/* Music Info */}
       {music && (
-        <div style={{ marginBottom: '10px' }}>
-          <p style={{ fontSize: '13px', fontWeight: 500, color: 'white', marginBottom: '3px' }}>
+        <div className="mb-2 sm:mb-2.5 md:mb-3">
+          <p className="text-xs sm:text-sm font-medium text-white mb-0.5 sm:mb-1 truncate">
             {music.title}
           </p>
-          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)' }}>
+          <p className="text-[10px] sm:text-xs text-white/45 truncate">
             {music.artist}
           </p>
         </div>
       )}
 
       {/* Divider */}
-      <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.06)', marginBottom: '10px' }} />
+      <div className="h-px bg-white/6 mb-2 sm:mb-2.5 md:mb-3" />
 
       {/* Link */}
       {music && (
@@ -79,15 +77,7 @@ export function NowPlayingCard({ timerState, timerStatus, isMusicEnabled }: NowP
           href={music.url}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '6px', 
-            fontSize: '10px', 
-            color: 'rgba(255,255,255,0.3)',
-            textDecoration: 'none',
-          }}
-          className="hover:text-white/50 transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 text-[9px] sm:text-[10px] text-white/30 hover:text-white/50 transition-colors cursor-pointer"
         >
           <YoutubeIcon />
           <span>View on YouTube</span>
@@ -100,7 +90,7 @@ export function NowPlayingCard({ timerState, timerStatus, isMusicEnabled }: NowP
 
 function MutedIcon() {
   return (
-    <svg style={{ width: '12px', height: '12px', color: 'rgba(255,255,255,0.35)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-3 h-3 text-white/35" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
     </svg>
@@ -109,7 +99,7 @@ function MutedIcon() {
 
 function YoutubeIcon() {
   return (
-    <svg style={{ width: '12px', height: '12px' }} fill="currentColor" viewBox="0 0 24 24">
+    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
       <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
     </svg>
   );
@@ -117,7 +107,7 @@ function YoutubeIcon() {
 
 function ExternalLinkIcon() {
   return (
-    <svg style={{ width: '10px', height: '10px', marginLeft: 'auto', opacity: 0.5 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-2.5 h-2.5 ml-auto opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
     </svg>
   );
