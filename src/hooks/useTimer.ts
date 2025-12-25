@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { TimerState, TimerStatus, PomodoroTemplate } from '@/types';
 import { minutesToSeconds } from '@/lib/utils';
 import { useAudio } from './useAudio';
@@ -39,8 +39,28 @@ export function useTimer(): UseTimerReturn {
   // Settings
   const [isMusicEnabled, setIsMusicEnabled] = useState(true);
   
-  // Refs for interval and audio
+  // Refs for interval
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Refs to track current state in callbacks (to avoid stale closures)
+  const timerStateRef = useRef(timerState);
+  const currentTemplateRef = useRef(currentTemplate);
+  const isMusicEnabledRef = useRef(isMusicEnabled);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    timerStateRef.current = timerState;
+  }, [timerState]);
+  
+  useEffect(() => {
+    currentTemplateRef.current = currentTemplate;
+  }, [currentTemplate]);
+  
+  useEffect(() => {
+    isMusicEnabledRef.current = isMusicEnabled;
+  }, [isMusicEnabled]);
+
+  // Audio controller
   const audio = useAudio();
 
   // Clear interval helper
@@ -54,11 +74,18 @@ export function useTimer(): UseTimerReturn {
   // Handle timer completion and state transitions
   const handleTimerComplete = useCallback(() => {
     clearTimerInterval();
+    
+    const currentState = timerStateRef.current;
+    const template = currentTemplateRef.current;
+    const musicEnabled = isMusicEnabledRef.current;
 
-    if (timerState === 'focus') {
+    console.log('[Timer] Timer complete, current state:', currentState, 'musicEnabled:', musicEnabled);
+
+    if (currentState === 'focus') {
       // Focus completed -> Start break
+      console.log('[Timer] Focus completed, starting break');
       setSessionsCompleted(prev => prev + 1);
-      const breakTime = minutesToSeconds(currentTemplate?.breakDuration || 5);
+      const breakTime = minutesToSeconds(template?.breakDuration || 5);
       setTimerState('break');
       setTimeRemaining(breakTime);
       setTotalTime(breakTime);
@@ -66,24 +93,30 @@ export function useTimer(): UseTimerReturn {
       
       // Play break alarm and music
       audio.playAlarmBreak();
-      if (isMusicEnabled) {
-        audio.playBreakMusic();
+      if (musicEnabled) {
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          audio.playBreakMusic();
+        }, 100);
       }
-    } else if (timerState === 'break') {
+    } else if (currentState === 'break') {
       // Break completed -> Start new focus
-      const focusTime = minutesToSeconds(currentTemplate?.focusDuration || 25);
+      console.log('[Timer] Break completed, starting focus');
+      const focusTime = minutesToSeconds(template?.focusDuration || 25);
       setTimerState('focus');
       setTimeRemaining(focusTime);
       setTotalTime(focusTime);
       setTimerStatus('running');
       
-      // Play focus alarm and music
+      // Play focus alarm and music  
       audio.playAlarmStart();
-      if (isMusicEnabled) {
-        audio.playFocusMusic();
+      if (musicEnabled) {
+        setTimeout(() => {
+          audio.playFocusMusic();
+        }, 100);
       }
     }
-  }, [timerState, currentTemplate, isMusicEnabled, audio, clearTimerInterval]);
+  }, [clearTimerInterval, audio]);
 
   // Timer tick effect
   useEffect(() => {
@@ -102,19 +135,10 @@ export function useTimer(): UseTimerReturn {
     return () => clearTimerInterval();
   }, [timerStatus, handleTimerComplete, clearTimerInterval]);
 
-  // Update audio music enabled state
+  // Sync music enabled state with audio controller
   useEffect(() => {
     audio.setMusicEnabled(isMusicEnabled);
-    
-    // If music is re-enabled during a session, start playing
-    if (isMusicEnabled && timerStatus === 'running') {
-      if (timerState === 'focus') {
-        audio.playFocusMusic();
-      } else if (timerState === 'break') {
-        audio.playBreakMusic();
-      }
-    }
-  }, [isMusicEnabled, timerStatus, timerState, audio]);
+  }, [isMusicEnabled, audio]);
 
   // Select a template
   const selectTemplate = useCallback((template: PomodoroTemplate) => {
@@ -132,16 +156,23 @@ export function useTimer(): UseTimerReturn {
   const startTimer = useCallback(() => {
     if (!currentTemplate) return;
     
+    console.log('[Timer] Starting timer, music enabled:', isMusicEnabled);
+    
     const focusTime = minutesToSeconds(currentTemplate.focusDuration);
     setTimerState('focus');
     setTimeRemaining(focusTime);
     setTotalTime(focusTime);
     setTimerStatus('running');
     
-    // Play start alarm and focus music
+    // Play start alarm
     audio.playAlarmStart();
+    
+    // Play focus music with small delay to ensure button click is processed
     if (isMusicEnabled) {
-      audio.playFocusMusic();
+      setTimeout(() => {
+        console.log('[Timer] Playing focus music after delay');
+        audio.playFocusMusic();
+      }, 150);
     }
   }, [currentTemplate, isMusicEnabled, audio]);
 
@@ -157,13 +188,17 @@ export function useTimer(): UseTimerReturn {
     setTimerStatus('running');
     
     if (isMusicEnabled) {
-      if (timerState === 'focus') {
-        audio.playFocusMusic();
-      } else if (timerState === 'break') {
-        audio.playBreakMusic();
-      }
+      // Use ref for current state to avoid stale closure
+      const currentState = timerStateRef.current;
+      setTimeout(() => {
+        if (currentState === 'focus') {
+          audio.playFocusMusic();
+        } else if (currentState === 'break') {
+          audio.playBreakMusic();
+        }
+      }, 100);
     }
-  }, [timerState, isMusicEnabled, audio]);
+  }, [isMusicEnabled, audio]);
 
   // Reset the timer
   const resetTimer = useCallback(() => {
@@ -182,8 +217,25 @@ export function useTimer(): UseTimerReturn {
 
   // Toggle music
   const toggleMusic = useCallback(() => {
-    setIsMusicEnabled(prev => !prev);
-  }, []);
+    setIsMusicEnabled(prev => {
+      const newValue = !prev;
+      console.log('[Timer] Toggle music:', newValue);
+      
+      // If turning music ON while timer is running, start playing
+      if (newValue && timerStatus === 'running') {
+        const currentState = timerStateRef.current;
+        setTimeout(() => {
+          if (currentState === 'focus') {
+            audio.playFocusMusic();
+          } else if (currentState === 'break') {
+            audio.playBreakMusic();
+          }
+        }, 100);
+      }
+      
+      return newValue;
+    });
+  }, [timerStatus, audio]);
 
   // Set custom durations
   const setCustomDurations = useCallback((focus: number, breakDuration: number) => {
