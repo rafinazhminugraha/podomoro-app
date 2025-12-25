@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
+import { AudioProvider } from '@/contexts/AudioContext';
 import './globals.css';
 
 const inter = Inter({
@@ -58,7 +59,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased">
-        {children}
+        <AudioProvider>
+          {children}
+        </AudioProvider>
       </body>
     </html>
   );

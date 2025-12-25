@@ -165,9 +165,10 @@ export function useTimer(): UseTimerReturn {
   }, [isMusicEnabled, audio]);
 
   // Select a template
-  const selectTemplate = useCallback((template: PomodoroTemplate) => {
+  const selectTemplate = useCallback(async (template: PomodoroTemplate) => {
     // Unlock audio for iOS - this is a user gesture, good opportunity to unlock
-    audio.unlockAudio();
+    // Must be called synchronously in the user gesture handler
+    await audio.unlockAudio();
     
     clearTimerInterval();
     isTransitioningRef.current = false;
@@ -181,13 +182,14 @@ export function useTimer(): UseTimerReturn {
   }, [clearTimerInterval, audio]);
 
   // Start the timer
-  const startTimer = useCallback(() => {
+  const startTimer = useCallback(async () => {
     if (!currentTemplate) return;
     
     console.log('[Timer] Starting timer, music enabled:', isMusicEnabled);
     
     // Unlock audio for iOS - must be called from user gesture
-    audio.unlockAudio();
+    // This MUST happen synchronously in the click handler
+    await audio.unlockAudio();
     
     isTransitioningRef.current = false;
     
@@ -197,14 +199,15 @@ export function useTimer(): UseTimerReturn {
     setTotalTime(focusTime);
     setTimerStatus('running');
     
-    // Play start alarm
+    // Play start alarm - no setTimeout needed, we've already unlocked
     audio.playAlarmStart();
     
     // Play focus music from beginning (always plays, volume controlled by mute state)
+    // Small delay to let alarm start playing first
     setTimeout(() => {
       console.log('[Timer] Playing focus music after delay');
       audio.playFocusMusic();
-    }, 150);
+    }, 100);
   }, [currentTemplate, audio, isMusicEnabled]);
 
   // Pause the timer - just pause music, don't reset
@@ -216,14 +219,16 @@ export function useTimer(): UseTimerReturn {
   }, [clearTimerInterval, audio]);
 
   // Resume the timer - resume music from where it was paused
-  const resumeTimer = useCallback(() => {
+  const resumeTimer = useCallback(async () => {
     console.log('[Timer] Resuming timer');
+    
+    // Unlock audio for iOS in case it wasn't unlocked before
+    await audio.unlockAudio();
+    
     setTimerStatus('running');
     
-    // Always resume music (volume controlled by mute state)
-    setTimeout(() => {
-      audio.resumeMusic();
-    }, 100);
+    // Resume music immediately (already unlocked)
+    audio.resumeMusic();
   }, [audio]);
 
   // Reset the timer - full stop and reset music
