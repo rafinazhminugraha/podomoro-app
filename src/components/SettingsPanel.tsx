@@ -13,7 +13,7 @@ export function SettingsPanel({
 }: SettingsPanelProps) {
   const iconButtonClasses = `
     group relative w-16 h-16 rounded-xl border transition-all duration-300
-    flex items-center justify-center
+    flex items-center justify-center cursor-pointer
     outline-none
     disabled:opacity-30 disabled:cursor-not-allowed
     active:scale-95
