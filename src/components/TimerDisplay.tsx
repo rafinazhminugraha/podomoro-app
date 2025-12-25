@@ -36,13 +36,11 @@ export function TimerDisplay({
     <div className="relative flex flex-col items-center justify-center">
       {/* Circular Progress */}
       <div className="relative w-72 h-72">
-        {/* Subtle glow effect */}
-        {timerStatus !== 'idle' && (
-          <div 
-            className="absolute inset-4 rounded-full blur-2xl opacity-10 transition-all duration-1000"
-            style={{ backgroundColor: stateColor }}
-          />
-        )}
+        {/* Subtle glow effect - always visible */}
+        <div 
+          className="absolute inset-4 rounded-full blur-2xl opacity-15 transition-all duration-1000"
+          style={{ backgroundColor: timerState === 'idle' ? '#ffffff' : stateColor }}
+        />
         
         {/* SVG Progress Ring */}
         <svg 
