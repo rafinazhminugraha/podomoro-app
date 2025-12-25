@@ -55,7 +55,7 @@ export function TimerDisplay({
             stroke="currentColor"
             strokeWidth="1"
             fill="none"
-            className="text-white/[0.06]"
+            className="text-white/6"
           />
           
           {/* Progress circle */}
