@@ -8,6 +8,7 @@ import {
   SessionCounter,
   SettingsPanel,
   NowPlayingCard,
+  InfoButton,
 } from '@/components';
 
 // Motivational messages based on sessions completed
@@ -74,6 +75,9 @@ export default function HomePage() {
 
       {/* Subtle Grid Pattern */}
       <div className="fixed inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
+
+      {/* Info Button - Top Right */}
+      <InfoButton />
 
       {/* Top - Motivational Message */}
       <div className="fixed top-8 sm:top-12 md:top-16 left-0 right-0 flex flex-col items-center z-10 pointer-events-none px-4">

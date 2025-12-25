@@ -31,51 +31,51 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Selection Colors */
+  ::selection {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+
+  /* Custom Scrollbar - Minimal */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Focus Ring - Subtle */
+  :focus-visible {
+    outline: 1px solid rgba(255, 255, 255, 0.2);
+    outline-offset: 2px;
+  }
+
+  /* Input Number Arrows (hide) */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    appearance: textfield;
+  }
 }
 
-/* Selection Colors */
-::selection {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: white;
-}
-
-/* Custom Scrollbar - Minimal */
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Focus Ring - Subtle */
-:focus-visible {
-  outline: 1px solid rgba(255, 255, 255, 0.2);
-  outline-offset: 2px;
-}
-
-/* Input Number Arrows (hide) */
-input[type='number']::-webkit-outer-spin-button,
-input[type='number']::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type='number'] {
-  appearance: textfield;
-}
-
-/* Animations */
+/* Animation Keyframes - These can stay outside layers */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -98,19 +98,20 @@ input[type='number'] {
   }
 }
 
-/* Animation Utilities */
-.animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
-}
+/* Custom Utilities - Inside @layer utilities so they work alongside Tailwind */
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 0.25s ease-out forwards;
+  }
 
-.animate-pulse {
-  animation: pulseGlow 2s ease-in-out infinite;
-}
+  .animate-pulse {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
 
-/* Background Pattern - Subtle Grid */
-.bg-grid-pattern {
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  background-size: 80px 80px;
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
 }
