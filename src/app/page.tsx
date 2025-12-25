@@ -35,7 +35,7 @@ export default function HomePage() {
       <div 
         className={`
           fixed left-0 top-1/2 -translate-y-1/2 -translate-x-1/2
-          w-[600px] h-[600px] rounded-full
+          w-150 h-150 rounded-full
           blur-[120px] pointer-events-none
           transition-all duration-1000 ease-out
           ${timerState === 'focus' ? 'bg-rose-500/20' : 
@@ -45,7 +45,7 @@ export default function HomePage() {
       <div 
         className={`
           fixed right-0 top-1/2 -translate-y-1/2 translate-x-1/2
-          w-[600px] h-[600px] rounded-full
+          w-150 h-150 rounded-full
           blur-[120px] pointer-events-none
           transition-all duration-1000 ease-out
           ${timerState === 'focus' ? 'bg-rose-500/20' : 
@@ -56,65 +56,55 @@ export default function HomePage() {
       {/* Subtle Grid Pattern */}
       <div className="fixed inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
 
-      {/* Main Content - Three Column Layout */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-8 py-12">
-        <div className="w-full max-w-7xl flex items-center justify-between gap-8">
-          
-          {/* Left Panel - Mode Selector */}
-          <aside 
-            className={`
-              flex-shrink-0 transition-all duration-500
-              ${isTimerActive ? 'opacity-30 pointer-events-none' : 'opacity-100'}
-            `}
-          >
-            <ModeSelector
-              selectedTemplate={currentTemplate}
-              onSelectTemplate={selectTemplate}
-              onCustomDurations={setCustomDurations}
-              disabled={isTimerActive}
-            />
-          </aside>
-
-          {/* Center - Timer + Session Counter */}
-          <div className="flex flex-col items-center justify-center flex-1">
-            {/* Timer Display */}
-            <TimerDisplay
-              timeRemaining={timeRemaining}
-              totalTime={totalTime}
-              timerState={timerState}
-              timerStatus={timerStatus}
-            />
-
-            {/* Session Counter - Below Timer */}
-            <div className="mt-8">
-              <SessionCounter sessionsCompleted={sessionsCompleted} />
-            </div>
+      {/* Timer - Always Centered */}
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-10">
+        <div className="flex flex-col items-center pointer-events-auto">
+          <TimerDisplay
+            timeRemaining={timeRemaining}
+            totalTime={totalTime}
+            timerState={timerState}
+            timerStatus={timerStatus}
+          />
+          <div className="mt-8">
+            <SessionCounter sessionsCompleted={sessionsCompleted} />
           </div>
-
-          {/* Right Panel - Controls */}
-          <aside className="shrink-0">
-            <div className="flex flex-col gap-4">
-              {/* Timer Controls */}
-              <TimerControls
-                timerStatus={timerStatus}
-                timerState={timerState}
-                hasTemplate={currentTemplate !== null}
-                onStart={startTimer}
-                onPause={pauseTimer}
-                onResume={resumeTimer}
-                onReset={resetTimer}
-              />
-
-              {/* Music Toggle */}
-              <SettingsPanel
-                isMusicEnabled={isMusicEnabled}
-                onToggleMusic={toggleMusic}
-              />
-            </div>
-          </aside>
-
         </div>
       </div>
+
+      {/* Left Panel - Mode Selector (Fixed Position) */}
+      <aside 
+        className={`
+          fixed left-40 top-1/2 -translate-y-1/2 z-20
+          transition-all duration-500
+          ${isTimerActive ? 'opacity-30 pointer-events-none' : 'opacity-100'}
+        `}
+      >
+        <ModeSelector
+          selectedTemplate={currentTemplate}
+          onSelectTemplate={selectTemplate}
+          onCustomDurations={setCustomDurations}
+          disabled={isTimerActive}
+        />
+      </aside>
+
+      {/* Right Panel - Controls (Fixed Position) */}
+      <aside className="fixed right-40 top-1/2 -translate-y-1/2 z-20">
+        <div className="flex flex-col gap-4">
+          <TimerControls
+            timerStatus={timerStatus}
+            timerState={timerState}
+            hasTemplate={currentTemplate !== null}
+            onStart={startTimer}
+            onPause={pauseTimer}
+            onResume={resumeTimer}
+            onReset={resetTimer}
+          />
+          <SettingsPanel
+            isMusicEnabled={isMusicEnabled}
+            onToggleMusic={toggleMusic}
+          />
+        </div>
+      </aside>
     </main>
   );
 }
