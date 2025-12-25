@@ -74,23 +74,23 @@ export function TimerDisplay({
         </svg>
 
         {/* Timer Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
           {/* State Label */}
           <span 
-            className="text-xs font-medium tracking-[0.2em] uppercase mb-3 transition-colors duration-500"
+            className="text-xs font-medium tracking-[0.2em] uppercase transition-colors duration-500"
             style={{ color: timerStatus !== 'idle' ? stateColor : 'rgba(255,255,255,0.4)' }}
           >
             {getStateLabel()}
           </span>
           
-          {/* Time Display */}
+          {/* Time Display - Centered anchor */}
           <span className="text-5xl font-extralight tracking-tight text-white font-mono tabular-nums">
             {formatTime(timeRemaining)}
           </span>
           
           {/* Status Indicator */}
-          {timerStatus !== 'idle' && (
-            <div className="mt-4 flex items-center gap-2">
+          {timerStatus !== 'idle' ? (
+            <div className="flex items-center gap-2">
               <span 
                 className={`w-1.5 h-1.5 rounded-full ${timerStatus === 'running' ? 'animate-pulse' : ''}`}
                 style={{ backgroundColor: timerStatus === 'paused' ? 'rgba(255,255,255,0.4)' : stateColor }}
@@ -99,6 +99,8 @@ export function TimerDisplay({
                 {timerStatus === 'paused' ? 'Paused' : timerState === 'focus' ? 'Focusing' : 'Resting'}
               </span>
             </div>
+          ) : (
+            <div className="h-5" /> 
           )}
         </div>
       </div>
