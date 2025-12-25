@@ -17,8 +17,8 @@ export const AUDIO_PATHS = {
 
 // Volume levels (0.0 - 1.0)
 export const AUDIO_VOLUMES = {
-  music: 0.3,      // Background music - subtle
-  alarm: 0.5,      // Alarm sounds - noticeable but not jarring
+  music: 1.0,      // Background music - audible at normal device volume
+  alarm: 0.6,      // Alarm sounds - noticeable
 } as const;
 
 export type AudioKey = keyof typeof AUDIO_PATHS;
