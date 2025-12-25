@@ -166,6 +166,9 @@ export function useTimer(): UseTimerReturn {
 
   // Select a template
   const selectTemplate = useCallback((template: PomodoroTemplate) => {
+    // Unlock audio for iOS - this is a user gesture, good opportunity to unlock
+    audio.unlockAudio();
+    
     clearTimerInterval();
     isTransitioningRef.current = false;
     setCurrentTemplate(template);
@@ -182,6 +185,10 @@ export function useTimer(): UseTimerReturn {
     if (!currentTemplate) return;
     
     console.log('[Timer] Starting timer, music enabled:', isMusicEnabled);
+    
+    // Unlock audio for iOS - must be called from user gesture
+    audio.unlockAudio();
+    
     isTransitioningRef.current = false;
     
     const focusTime = minutesToSeconds(currentTemplate.focusDuration);
@@ -198,7 +205,7 @@ export function useTimer(): UseTimerReturn {
       console.log('[Timer] Playing focus music after delay');
       audio.playFocusMusic();
     }, 150);
-  }, [currentTemplate, audio]);
+  }, [currentTemplate, audio, isMusicEnabled]);
 
   // Pause the timer - just pause music, don't reset
   const pauseTimer = useCallback(() => {

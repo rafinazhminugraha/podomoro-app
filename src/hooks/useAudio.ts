@@ -12,8 +12,10 @@ interface AudioController {
   playAlarmStart: () => void;
   playAlarmBreak: () => void;
   setMusicEnabled: (enabled: boolean) => void;  // Mute/unmute (volume control only)
+  unlockAudio: () => void;     // Call on first user interaction to unlock iOS audio
   isMusicPlaying: boolean;
   currentMusicType: 'focus' | 'break' | null;
+  isAudioUnlocked: boolean;
 }
 
 export function useAudio(): AudioController {
@@ -21,6 +23,7 @@ export function useAudio(): AudioController {
   const [musicEnabled, setMusicEnabledState] = useState(true);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [currentMusicType, setCurrentMusicType] = useState<'focus' | 'break' | null>(null);
+  const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
   
   // Audio element refs
   const focusMusicRef = useRef<HTMLAudioElement | null>(null);
@@ -30,6 +33,7 @@ export function useAudio(): AudioController {
   
   // Track if audio elements are initialized
   const isInitializedRef = useRef(false);
+  const isUnlockingRef = useRef(false);
 
   // Helper to get the correct volume based on mute state
   const getMusicVolume = useCallback((enabled: boolean) => {
@@ -49,6 +53,53 @@ export function useAudio(): AudioController {
     }
   }, [getMusicVolume]);
 
+  // Unlock audio for iOS - must be called from a user gesture (tap/click)
+  const unlockAudio = useCallback(() => {
+    if (isAudioUnlocked || isUnlockingRef.current) {
+      console.log('[Audio] Already unlocked or unlocking');
+      return;
+    }
+    
+    isUnlockingRef.current = true;
+    console.log('[Audio] Unlocking audio for iOS...');
+    
+    const unlockElement = async (element: HTMLAudioElement | null, name: string) => {
+      if (!element) return;
+      
+      try {
+        // Save current volume, set to 0 for silent unlock
+        const originalVolume = element.volume;
+        element.volume = 0;
+        element.muted = true;
+        
+        // Play briefly then pause - this unlocks the element on iOS
+        await element.play();
+        element.pause();
+        element.currentTime = 0;
+        
+        // Restore volume and unmute
+        element.volume = originalVolume;
+        element.muted = false;
+        
+        console.log(`[Audio] ${name} unlocked successfully`);
+      } catch (error) {
+        console.log(`[Audio] ${name} unlock failed:`, error);
+      }
+    };
+    
+    // Unlock all audio elements
+    Promise.all([
+      unlockElement(focusMusicRef.current, 'Focus music'),
+      unlockElement(breakMusicRef.current, 'Break music'),
+      unlockElement(alarmStartRef.current, 'Start alarm'),
+      unlockElement(alarmBreakRef.current, 'Break alarm'),
+    ]).then(() => {
+      console.log('[Audio] All audio elements unlocked for iOS');
+      setIsAudioUnlocked(true);
+      isUnlockingRef.current = false;
+    });
+  }, [isAudioUnlocked]);
+
   // Initialize audio elements on mount
   useEffect(() => {
     if (typeof window === 'undefined' || isInitializedRef.current) return;
@@ -66,21 +117,26 @@ export function useAudio(): AudioController {
       focusMusicRef.current.loop = true;
       focusMusicRef.current.volume = AUDIO_VOLUMES.music;
       focusMusicRef.current.preload = 'auto';
+      // iOS needs this attribute
+      focusMusicRef.current.setAttribute('playsinline', 'true');
     }
     if (breakMusicRef.current) {
       breakMusicRef.current.loop = true;
       breakMusicRef.current.volume = AUDIO_VOLUMES.music;
       breakMusicRef.current.preload = 'auto';
+      breakMusicRef.current.setAttribute('playsinline', 'true');
     }
 
     // Configure alarm volumes
     if (alarmStartRef.current) {
       alarmStartRef.current.volume = AUDIO_VOLUMES.alarm;
       alarmStartRef.current.preload = 'auto';
+      alarmStartRef.current.setAttribute('playsinline', 'true');
     }
     if (alarmBreakRef.current) {
       alarmBreakRef.current.volume = AUDIO_VOLUMES.alarm;
       alarmBreakRef.current.preload = 'auto';
+      alarmBreakRef.current.setAttribute('playsinline', 'true');
     }
 
     isInitializedRef.current = true;
@@ -259,7 +315,9 @@ export function useAudio(): AudioController {
     playAlarmStart,
     playAlarmBreak,
     setMusicEnabled,
+    unlockAudio,
     isMusicPlaying,
     currentMusicType,
+    isAudioUnlocked,
   };
 }
