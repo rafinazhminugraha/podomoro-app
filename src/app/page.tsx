@@ -76,7 +76,7 @@ export default function HomePage() {
 
       {/* Top - Motivational Message */}
       <div className="fixed top-16 left-0 right-0 flex flex-col items-center z-10 pointer-events-none">
-        <h1 className="text-2xl font-light text-white tracking-wide transition-all duration-500">
+        <h1 className="text-2xl font-bold text-white tracking-wide transition-all duration-500">
           {motivation.title}
         </h1>
         <p className="mt-2 text-sm text-white/40 tracking-wider">
