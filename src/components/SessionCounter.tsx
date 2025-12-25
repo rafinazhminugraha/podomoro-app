@@ -26,7 +26,7 @@ export function SessionCounter({ sessionsCompleted }: SessionCounterProps) {
         {dots.map((_, index) => (
           <div
             key={index}
-            className="w-3 h-3 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 shadow-lg shadow-rose-500/30"
+            className="w-3 h-3 rounded-full bg-linear-to-br from-rose-400 to-rose-600 shadow-lg shadow-rose-500/30"
             style={{
               animation: `pulseGlow 2s ease-in-out infinite`,
               animationDelay: `${index * 0.1}s`,

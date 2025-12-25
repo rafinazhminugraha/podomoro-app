@@ -40,7 +40,7 @@ export default function HomePage() {
       {/* Animated Gradient Orbs */}
       <div 
         className={`
-          gradient-orb w-[600px] h-[600px] -top-[200px] -left-[200px]
+          gradient-orb w-150 h-150 -top-50 -left-50
           transition-all duration-1000 ease-out
           ${timerState === 'focus' ? 'gradient-orb-focus opacity-30' : 
             timerState === 'break' ? 'gradient-orb-break opacity-30' : 'opacity-10'}
@@ -49,7 +49,7 @@ export default function HomePage() {
       />
       <div 
         className={`
-          gradient-orb w-[500px] h-[500px] -bottom-[150px] -right-[150px]
+          gradient-orb w-125 h-125 -bottom-37.5 -right-37.5
           transition-all duration-1000 ease-out animate-breathe
           ${timerState === 'focus' ? 'gradient-orb-focus opacity-20' : 
             timerState === 'break' ? 'gradient-orb-break opacity-20' : 'opacity-5'}
