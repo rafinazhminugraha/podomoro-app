@@ -54,7 +54,7 @@ export default function HomePage() {
       <div 
         className={`
           fixed left-0 top-1/2 -translate-y-1/2 -translate-x-1/2
-          w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]
+          w-75 h-75 sm:w-100 sm:h-100 md:w-125 md:h-125 lg:w-150 lg:h-150
           rounded-full blur-[80px] sm:blur-[100px] md:blur-[120px]
           pointer-events-none transition-all duration-1000 ease-out
           ${timerState === 'focus' ? 'bg-rose-500/20' : 
@@ -64,7 +64,7 @@ export default function HomePage() {
       <div 
         className={`
           fixed right-0 top-1/2 -translate-y-1/2 translate-x-1/2
-          w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]
+          w-75 h-75 sm:w-100 sm:h-100 md:w-125 md:h-125 lg:w-150 lg:h-150
           rounded-full blur-[80px] sm:blur-[100px] md:blur-[120px]
           pointer-events-none transition-all duration-1000 ease-out
           ${timerState === 'focus' ? 'bg-rose-500/20' : 

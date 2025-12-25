@@ -78,7 +78,7 @@ export function ModeSelector({
                 className={`
                   group relative rounded-xl border transition-all duration-300
                   
-                  py-2 px-2 min-h-[70px] 
+                  py-2 px-2 min-h-17.5 
                   
                   flex flex-col items-center justify-center gap-0.5
                   outline-none active:scale-[0.98]
@@ -110,7 +110,7 @@ export function ModeSelector({
               className={`
                 group relative rounded-xl border transition-all duration-300
                 
-                py-2 px-2 min-h-[70px]
+                py-2 px-2 min-h-17.5
                 
                 flex flex-col items-center justify-center gap-0.5
                 outline-none active:scale-[0.98]
