@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { TimerState, TimerStatus, PomodoroTemplate } from '@/types';
 import { minutesToSeconds } from '@/lib/utils';
 import { useAudio } from './useAudio';
@@ -42,23 +42,8 @@ export function useTimer(): UseTimerReturn {
   // Refs for interval
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Refs to track current state in callbacks (to avoid stale closures)
-  const timerStateRef = useRef(timerState);
-  const currentTemplateRef = useRef(currentTemplate);
-  const isMusicEnabledRef = useRef(isMusicEnabled);
-  
-  // Keep refs in sync with state
-  useEffect(() => {
-    timerStateRef.current = timerState;
-  }, [timerState]);
-  
-  useEffect(() => {
-    currentTemplateRef.current = currentTemplate;
-  }, [currentTemplate]);
-  
-  useEffect(() => {
-    isMusicEnabledRef.current = isMusicEnabled;
-  }, [isMusicEnabled]);
+  // Ref to prevent double handling of completion
+  const isTransitioningRef = useRef(false);
 
   // Audio controller
   const audio = useAudio();
@@ -72,68 +57,107 @@ export function useTimer(): UseTimerReturn {
   }, []);
 
   // Handle timer completion and state transitions
-  const handleTimerComplete = useCallback(() => {
-    clearTimerInterval();
-    
-    const currentState = timerStateRef.current;
-    const template = currentTemplateRef.current;
-    const musicEnabled = isMusicEnabledRef.current;
+  const handleTimerComplete = useCallback((completedState: TimerState, template: PomodoroTemplate | null, musicEnabled: boolean) => {
+    // Prevent double triggering
+    if (isTransitioningRef.current) {
+      console.log('[Timer] Already transitioning, skipping');
+      return;
+    }
+    isTransitioningRef.current = true;
 
-    console.log('[Timer] Timer complete, current state:', currentState, 'musicEnabled:', musicEnabled);
+    console.log('[Timer] Timer complete, completed state:', completedState, 'musicEnabled:', musicEnabled);
 
-    if (currentState === 'focus') {
+    if (completedState === 'focus') {
       // Focus completed -> Start break
+      audio.stopMusic();
+      
       console.log('[Timer] Focus completed, starting break');
       setSessionsCompleted(prev => prev + 1);
+      
       const breakTime = minutesToSeconds(template?.breakDuration || 5);
+      console.log('[Timer] Break duration:', breakTime, 'seconds');
+      
+      // Set break state
       setTimerState('break');
       setTimeRemaining(breakTime);
       setTotalTime(breakTime);
-      setTimerStatus('running');
       
-      // Play break alarm and music
+      // Play break alarm and start break music (always plays, volume controlled by mute state)
       audio.playAlarmBreak();
-      if (musicEnabled) {
-        // Small delay to ensure state is updated
-        setTimeout(() => {
-          audio.playBreakMusic();
-        }, 100);
-      }
-    } else if (currentState === 'break') {
+      setTimeout(() => {
+        audio.playBreakMusic();
+      }, 100);
+      
+      // Allow next transition after state is set
+      setTimeout(() => {
+        isTransitioningRef.current = false;
+      }, 200);
+      
+    } else if (completedState === 'break') {
       // Break completed -> Start new focus
+      audio.stopMusic();
+      
       console.log('[Timer] Break completed, starting focus');
+      
       const focusTime = minutesToSeconds(template?.focusDuration || 25);
+      console.log('[Timer] Focus duration:', focusTime, 'seconds');
+      
+      // Set focus state
       setTimerState('focus');
       setTimeRemaining(focusTime);
       setTotalTime(focusTime);
-      setTimerStatus('running');
       
-      // Play focus alarm and music  
+      // Play focus alarm and start focus music (always plays, volume controlled by mute state)
       audio.playAlarmStart();
-      if (musicEnabled) {
-        setTimeout(() => {
-          audio.playFocusMusic();
-        }, 100);
-      }
+      setTimeout(() => {
+        audio.playFocusMusic();
+      }, 100);
+      
+      // Allow next transition after state is set
+      setTimeout(() => {
+        isTransitioningRef.current = false;
+      }, 200);
     }
-  }, [clearTimerInterval, audio]);
+  }, [audio]);
 
-  // Timer tick effect
+  // Timer tick effect - separate from completion handling
   useEffect(() => {
-    if (timerStatus === 'running') {
-      intervalRef.current = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1) {
-            handleTimerComplete();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    // Only run interval when status is 'running'
+    if (timerStatus !== 'running') {
+      return;
     }
 
-    return () => clearTimerInterval();
-  }, [timerStatus, handleTimerComplete, clearTimerInterval]);
+    console.log('[Timer] Starting interval, timeRemaining:', timeRemaining, 'timerState:', timerState);
+
+    intervalRef.current = setInterval(() => {
+      setTimeRemaining(prev => {
+        // Don't decrement if we're in a transition
+        if (isTransitioningRef.current) {
+          return prev;
+        }
+        
+        if (prev <= 1) {
+          // Timer completed - clear interval first
+          clearTimerInterval();
+          // Return 0, and let the completion effect handle the transition
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearTimerInterval();
+    };
+  }, [timerStatus, timerState, clearTimerInterval]); // Include timerState to recreate interval on state transitions (focus <-> break)
+
+  // Separate effect to handle timer completion when timeRemaining hits 0
+  useEffect(() => {
+    if (timeRemaining === 0 && timerStatus === 'running' && timerState !== 'idle') {
+      console.log('[Timer] Time reached 0, handling completion for state:', timerState);
+      handleTimerComplete(timerState, currentTemplate, isMusicEnabled);
+    }
+  }, [timeRemaining, timerStatus, timerState, currentTemplate, isMusicEnabled, handleTimerComplete]);
 
   // Sync music enabled state with audio controller
   useEffect(() => {
@@ -143,6 +167,7 @@ export function useTimer(): UseTimerReturn {
   // Select a template
   const selectTemplate = useCallback((template: PomodoroTemplate) => {
     clearTimerInterval();
+    isTransitioningRef.current = false;
     setCurrentTemplate(template);
     const focusTime = minutesToSeconds(template.focusDuration);
     setTimeRemaining(focusTime);
@@ -157,6 +182,7 @@ export function useTimer(): UseTimerReturn {
     if (!currentTemplate) return;
     
     console.log('[Timer] Starting timer, music enabled:', isMusicEnabled);
+    isTransitioningRef.current = false;
     
     const focusTime = minutesToSeconds(currentTemplate.focusDuration);
     setTimerState('focus');
@@ -167,42 +193,37 @@ export function useTimer(): UseTimerReturn {
     // Play start alarm
     audio.playAlarmStart();
     
-    // Play focus music with small delay to ensure button click is processed
-    if (isMusicEnabled) {
-      setTimeout(() => {
-        console.log('[Timer] Playing focus music after delay');
-        audio.playFocusMusic();
-      }, 150);
-    }
-  }, [currentTemplate, isMusicEnabled, audio]);
+    // Play focus music from beginning (always plays, volume controlled by mute state)
+    setTimeout(() => {
+      console.log('[Timer] Playing focus music after delay');
+      audio.playFocusMusic();
+    }, 150);
+  }, [currentTemplate, audio]);
 
-  // Pause the timer
+  // Pause the timer - just pause music, don't reset
   const pauseTimer = useCallback(() => {
+    console.log('[Timer] Pausing timer');
     clearTimerInterval();
     setTimerStatus('paused');
-    audio.stopMusic();
+    audio.pauseMusic();
   }, [clearTimerInterval, audio]);
 
-  // Resume the timer
+  // Resume the timer - resume music from where it was paused
   const resumeTimer = useCallback(() => {
+    console.log('[Timer] Resuming timer');
     setTimerStatus('running');
     
-    if (isMusicEnabled) {
-      // Use ref for current state to avoid stale closure
-      const currentState = timerStateRef.current;
-      setTimeout(() => {
-        if (currentState === 'focus') {
-          audio.playFocusMusic();
-        } else if (currentState === 'break') {
-          audio.playBreakMusic();
-        }
-      }, 100);
-    }
-  }, [isMusicEnabled, audio]);
+    // Always resume music (volume controlled by mute state)
+    setTimeout(() => {
+      audio.resumeMusic();
+    }, 100);
+  }, [audio]);
 
-  // Reset the timer
+  // Reset the timer - full stop and reset music
   const resetTimer = useCallback(() => {
+    console.log('[Timer] Resetting timer');
     clearTimerInterval();
+    isTransitioningRef.current = false;
     audio.stopMusic();
     
     if (currentTemplate) {
@@ -215,27 +236,15 @@ export function useTimer(): UseTimerReturn {
     setTimerStatus('idle');
   }, [clearTimerInterval, currentTemplate, audio]);
 
-  // Toggle music
+  // Toggle music (mute/unmute)
   const toggleMusic = useCallback(() => {
     setIsMusicEnabled(prev => {
       const newValue = !prev;
       console.log('[Timer] Toggle music:', newValue);
-      
-      // If turning music ON while timer is running, start playing
-      if (newValue && timerStatus === 'running') {
-        const currentState = timerStateRef.current;
-        setTimeout(() => {
-          if (currentState === 'focus') {
-            audio.playFocusMusic();
-          } else if (currentState === 'break') {
-            audio.playBreakMusic();
-          }
-        }, 100);
-      }
-      
+      // The audio.setMusicEnabled will handle resuming music automatically via the useEffect sync
       return newValue;
     });
-  }, [timerStatus, audio]);
+  }, []);
 
   // Set custom durations
   const setCustomDurations = useCallback((focus: number, breakDuration: number) => {

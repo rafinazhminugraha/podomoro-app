@@ -6,17 +6,21 @@ import { AUDIO_PATHS, AUDIO_VOLUMES } from '@/lib/audio';
 interface AudioController {
   playFocusMusic: () => void;
   playBreakMusic: () => void;
-  stopMusic: () => void;
+  pauseMusic: () => void;      // Pause without resetting position (for timer pause)
+  resumeMusic: () => void;     // Resume from paused position (for timer resume)
+  stopMusic: () => void;       // Stop and reset to beginning (for session reset)
   playAlarmStart: () => void;
   playAlarmBreak: () => void;
-  setMusicEnabled: (enabled: boolean) => void;
+  setMusicEnabled: (enabled: boolean) => void;  // Mute/unmute (volume control only)
   isMusicPlaying: boolean;
+  currentMusicType: 'focus' | 'break' | null;
 }
 
 export function useAudio(): AudioController {
-  // Use state instead of ref for musicEnabled to trigger re-renders
+  // Mute state - controls volume, NOT playback
   const [musicEnabled, setMusicEnabledState] = useState(true);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [currentMusicType, setCurrentMusicType] = useState<'focus' | 'break' | null>(null);
   
   // Audio element refs
   const focusMusicRef = useRef<HTMLAudioElement | null>(null);
@@ -26,6 +30,24 @@ export function useAudio(): AudioController {
   
   // Track if audio elements are initialized
   const isInitializedRef = useRef(false);
+
+  // Helper to get the correct volume based on mute state
+  const getMusicVolume = useCallback((enabled: boolean) => {
+    return enabled ? AUDIO_VOLUMES.music : 0;
+  }, []);
+
+  // Update volume on all music elements when mute state changes
+  const updateMusicVolume = useCallback((enabled: boolean) => {
+    const volume = getMusicVolume(enabled);
+    console.log('[Audio] Updating music volume to:', volume);
+    
+    if (focusMusicRef.current) {
+      focusMusicRef.current.volume = volume;
+    }
+    if (breakMusicRef.current) {
+      breakMusicRef.current.volume = volume;
+    }
+  }, [getMusicVolume]);
 
   // Initialize audio elements on mount
   useEffect(() => {
@@ -77,8 +99,21 @@ export function useAudio(): AudioController {
     };
   }, []);
 
+  // Pause music without resetting position (for timer pause - actual pause, not mute)
+  const pauseMusic = useCallback(() => {
+    console.log('[Audio] Pausing music (keeping position)');
+    if (focusMusicRef.current) {
+      focusMusicRef.current.pause();
+    }
+    if (breakMusicRef.current) {
+      breakMusicRef.current.pause();
+    }
+    setIsMusicPlaying(false);
+  }, []);
+
+  // Stop music and reset to beginning (for session complete or reset)
   const stopMusic = useCallback(() => {
-    console.log('[Audio] Stopping music');
+    console.log('[Audio] Stopping music (resetting position)');
     if (focusMusicRef.current) {
       focusMusicRef.current.pause();
       focusMusicRef.current.currentTime = 0;
@@ -88,84 +123,104 @@ export function useAudio(): AudioController {
       breakMusicRef.current.currentTime = 0;
     }
     setIsMusicPlaying(false);
+    setCurrentMusicType(null);
   }, []);
 
-  const playFocusMusic = useCallback(() => {
-    console.log('[Audio] playFocusMusic called, musicEnabled:', musicEnabled);
-    if (!musicEnabled) {
-      console.log('[Audio] Music is disabled, skipping focus music');
-      return;
-    }
+  // Resume music from paused position (for timer resume)
+  const resumeMusic = useCallback(() => {
+    console.log('[Audio] Resuming music, currentType:', currentMusicType);
+    if (!currentMusicType) return;
     
-    // Stop any currently playing music first
+    const audioElement = currentMusicType === 'focus' ? focusMusicRef.current : breakMusicRef.current;
+    
+    if (audioElement) {
+      console.log('[Audio] Resuming', currentMusicType, 'music from position:', audioElement.currentTime);
+      const playPromise = audioElement.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('[Audio] Music resumed successfully');
+            setIsMusicPlaying(true);
+          })
+          .catch((error) => {
+            console.log('[Audio] Resume failed:', error.message);
+          });
+      }
+    }
+  }, [currentMusicType]);
+
+  // Play focus music - ALWAYS plays, volume is controlled by mute state
+  const playFocusMusic = useCallback(() => {
+    console.log('[Audio] playFocusMusic called, musicEnabled (mute state):', musicEnabled);
+    
+    // Stop break music if playing
     if (breakMusicRef.current) {
       breakMusicRef.current.pause();
       breakMusicRef.current.currentTime = 0;
     }
     
     if (focusMusicRef.current) {
-      console.log('[Audio] Playing focus music...');
+      console.log('[Audio] Playing focus music from beginning...');
       focusMusicRef.current.currentTime = 0;
+      // Set volume based on current mute state
+      focusMusicRef.current.volume = getMusicVolume(musicEnabled);
+      
       const playPromise = focusMusicRef.current.play();
       
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log('[Audio] Focus music started playing');
+            console.log('[Audio] Focus music started playing (volume:', focusMusicRef.current?.volume, ')');
             setIsMusicPlaying(true);
+            setCurrentMusicType('focus');
           })
           .catch((error) => {
             console.log('[Audio] Focus music playback failed:', error.message);
-            // Try to play again after a short delay (browser autoplay policy)
-            setTimeout(() => {
-              focusMusicRef.current?.play().catch(() => {
-                console.log('[Audio] Retry failed - user interaction required');
-              });
-            }, 100);
+            setCurrentMusicType('focus');
           });
       }
     } else {
       console.log('[Audio] Focus music element not ready');
+      setCurrentMusicType('focus');
     }
-  }, [musicEnabled]);
+  }, [musicEnabled, getMusicVolume]);
 
+  // Play break music - ALWAYS plays, volume is controlled by mute state
   const playBreakMusic = useCallback(() => {
-    console.log('[Audio] playBreakMusic called, musicEnabled:', musicEnabled);
-    if (!musicEnabled) {
-      console.log('[Audio] Music is disabled, skipping break music');
-      return;
-    }
+    console.log('[Audio] playBreakMusic called, musicEnabled (mute state):', musicEnabled);
     
-    // Stop any currently playing music first
+    // Stop focus music if playing
     if (focusMusicRef.current) {
       focusMusicRef.current.pause();
       focusMusicRef.current.currentTime = 0;
     }
     
     if (breakMusicRef.current) {
-      console.log('[Audio] Playing break music...');
+      console.log('[Audio] Playing break music from beginning...');
       breakMusicRef.current.currentTime = 0;
+      // Set volume based on current mute state
+      breakMusicRef.current.volume = getMusicVolume(musicEnabled);
+      
       const playPromise = breakMusicRef.current.play();
       
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log('[Audio] Break music started playing');
+            console.log('[Audio] Break music started playing (volume:', breakMusicRef.current?.volume, ')');
             setIsMusicPlaying(true);
+            setCurrentMusicType('break');
           })
           .catch((error) => {
             console.log('[Audio] Break music playback failed:', error.message);
-            setTimeout(() => {
-              breakMusicRef.current?.play().catch(() => {
-                console.log('[Audio] Retry failed - user interaction required');
-              });
-            }, 100);
+            setCurrentMusicType('break');
           });
       }
     } else {
       console.log('[Audio] Break music element not ready');
+      setCurrentMusicType('break');
     }
-  }, [musicEnabled]);
+  }, [musicEnabled, getMusicVolume]);
 
   const playAlarmStart = useCallback(() => {
     console.log('[Audio] Playing start alarm');
@@ -187,21 +242,24 @@ export function useAudio(): AudioController {
     }
   }, []);
 
+  // Mute/Unmute - ONLY changes volume, does NOT stop/start playback
   const setMusicEnabled = useCallback((enabled: boolean) => {
-    console.log('[Audio] setMusicEnabled:', enabled);
+    console.log('[Audio] setMusicEnabled (mute/unmute):', enabled);
     setMusicEnabledState(enabled);
-    if (!enabled) {
-      stopMusic();
-    }
-  }, [stopMusic]);
+    // Just update the volume - music keeps playing either way
+    updateMusicVolume(enabled);
+  }, [updateMusicVolume]);
 
   return {
     playFocusMusic,
     playBreakMusic,
+    pauseMusic,
+    resumeMusic,
     stopMusic,
     playAlarmStart,
     playAlarmBreak,
     setMusicEnabled,
     isMusicPlaying,
+    currentMusicType,
   };
 }
