@@ -7,6 +7,7 @@ import {
   ModeSelector,
   SessionCounter,
   SettingsPanel,
+  NowPlayingCard,
 } from '@/components';
 
 // Motivational messages based on sessions completed
@@ -135,6 +136,15 @@ export default function HomePage() {
           />
         </div>
       </aside>
+
+      {/* Bottom Right - Now Playing Card */}
+      <div className="fixed bottom-8 right-8 z-20">
+        <NowPlayingCard
+          timerState={timerState}
+          timerStatus={timerStatus}
+          isMusicEnabled={isMusicEnabled}
+        />
+      </div>
     </main>
   );
 }
