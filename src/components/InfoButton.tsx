@@ -45,8 +45,8 @@ export function InfoButton() {
           <div 
             className="absolute inset-0 bg-black/20"
             style={{ 
-              backdropFilter: 'blur(18px)',
-              WebkitBackdropFilter: 'blur(15px)'
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)'
             }} 
           />
           
@@ -58,10 +58,6 @@ export function InfoButton() {
                 p-6 sm:p-8
                 shadow-2xl shadow-black/50
               "
-              style={{ 
-                backdropFilter: 'blur(40px)',
-                WebkitBackdropFilter: 'blur(40px)'
-              }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}

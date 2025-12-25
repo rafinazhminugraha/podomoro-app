@@ -125,7 +125,7 @@ export default function HomePage() {
       </aside>
 
       {/* Right Panel - Controls */}
-      <aside className="fixed right-4 sm:right-6 md:right-10 lg:right-16 xl:right-24 2xl:right-40 top-1/2 -translate-y-1/2 z-20">
+      <aside className="fixed right-4 sm:right-6 md:right-10 lg:right-16 xl:right-24 2xl:right-40 top-1/2 -translate-y-1/2 z-40">
         <div className="flex flex-col gap-3 sm:gap-4">
           <TimerControls
             timerStatus={timerStatus}
