@@ -5,6 +5,7 @@ import {
   TimerDisplay,
   TimerControls,
   ModeSelector,
+  ModeSelectorModal,
   SessionCounter,
   SettingsPanel,
   NowPlayingCard,
@@ -101,8 +102,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Bottom - Session Counter */}
-      <div className="fixed bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex justify-center z-10 pointer-events-none">
+      {/* Bottom - Session Counter (Hidden on mobile when timer is not active to make room for mode button) */}
+      <div className={`
+        fixed bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex justify-center z-10 pointer-events-none
+        ${!isTimerActive ? 'hidden md:flex' : 'flex'}
+      `}>
         <SessionCounter sessionsCompleted={sessionsCompleted} />
       </div>
 
@@ -143,25 +147,21 @@ export default function HomePage() {
         </div>
       </aside>
 
-      {/* Mobile Mode Selector - Bottom Sheet style (visible only on mobile) */}
+      {/* Mobile Mode Selector Button - Opens Modal (visible only on mobile when timer is not active) */}
       <div 
         className={`
-          fixed bottom-4 left-4 right-4 z-30 md:hidden
-          bg-transparent backdrop-blur-lg
-          transition-all duration-500 px-4
-          ${isTimerActive ? 'translate-y-[150%]' : 'translate-y-0'}
-          shadow-2xl shadow-black/50
+          fixed bottom-6 left-0 right-0 z-30 md:hidden
+          flex justify-center
+          transition-all duration-500
+          ${isTimerActive ? 'translate-y-[150%] opacity-0' : 'translate-y-0 opacity-100'}
         `}
       >
-        <div className="py-4">
-          <ModeSelector
-            selectedTemplate={currentTemplate}
-            onSelectTemplate={selectTemplate}
-            onCustomDurations={setCustomDurations}
-            disabled={isTimerActive}
-            horizontal
-          />
-        </div>
+        <ModeSelectorModal
+          selectedTemplate={currentTemplate}
+          onSelectTemplate={selectTemplate}
+          onCustomDurations={setCustomDurations}
+          disabled={isTimerActive}
+        />
       </div>
 
       {/* Bottom Right - Now Playing Card (Hidden on small screens) */}

@@ -10,7 +10,6 @@ interface ModeSelectorProps {
   onSelectTemplate: (template: PomodoroTemplate) => void;
   onCustomDurations: (focus: number, breakDuration: number) => void;
   disabled?: boolean;
-  horizontal?: boolean; // For mobile horizontal layout
 }
 
 export function ModeSelector({
@@ -18,7 +17,6 @@ export function ModeSelector({
   onSelectTemplate,
   onCustomDurations,
   disabled = false,
-  horizontal = false,
 }: ModeSelectorProps) {
   const [isCustomMode, setIsCustomMode] = useState(false);
   const [customFocus, setCustomFocus] = useState(25);
@@ -64,156 +62,7 @@ export function ModeSelector({
     bg-white/2 border-white/6
   `;
 
-  // Mobile layout - Premium design matching desktop aesthetic
-  if (horizontal) {
-      return (
-        <div className="flex flex-col gap-1.5 w-full"> {/* Gap diperkecil jadi 1.5 */}
-          
-          {/* Preset Templates - 2x2 Grid */}
-          <div className="grid grid-cols-2 gap-1.5">
-            {POMODORO_TEMPLATES.map((template) => (
-              <button
-                key={template.id}
-                onClick={() => handleTemplateSelect(template)}
-                disabled={disabled}
-                className={`
-                  group relative rounded-xl border transition-all duration-300
-                  
-                  py-2 px-2 min-h-17.5 
-                  
-                  flex flex-col items-center justify-center gap-0.5
-                  outline-none active:scale-[0.98]
-                  ${!isCustomMode && selectedTemplate?.id === template.id
-                    ? 'bg-white/8 border-white/20'
-                    : 'bg-white/3 border-white/8 hover:bg-white/5 hover:border-white/12'
-                  }
-                  ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
-                `}
-              >
-                <span className="text-[9px] font-medium text-white/70 tracking-wide uppercase">
-                  {template.name}
-                </span>
-                <span className="text-base font-medium text-white tracking-tight my-0.5">
-                  {template.focusDuration} : {template.breakDuration}
-                </span>
-                <span className="text-[8px] font-medium text-white/30 tracking-wide">
-                  Focus : Break
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* Custom Mode Row */}
-          <div className={`grid gap-1.5 ${isCustomMode ? 'grid-cols-2' : 'grid-cols-1'}`}>
-            <button
-              onClick={handleCustomToggle}
-              disabled={disabled}
-              className={`
-                group relative rounded-xl border transition-all duration-300
-                
-                py-2 px-2 min-h-17.5
-                
-                flex flex-col items-center justify-center gap-0.5
-                outline-none active:scale-[0.98]
-                ${isCustomMode
-                  ? 'bg-white/8 border-white/20'
-                  : 'bg-white/3 border-white/8 hover:bg-white/5 hover:border-white/12'
-                }
-                ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
-              `}
-            >
-              <span className="text-[9px] font-medium text-white/70 tracking-wide uppercase">
-                Custom
-              </span>
-              <span className="text-base font-medium text-white tracking-tight my-0.5">
-                {customFocus} : {customBreak}
-              </span>
-              <span className="text-[8px] font-medium text-white/30 tracking-wide">
-                Focus : Break
-              </span>
-            </button>
-
-            {/* Custom Settings - Super Compact Panel */}
-            {isCustomMode && !disabled && (
-              <div className={`
-                rounded-xl bg-white/3 border border-white/8
-                py-2 px-3
-                flex flex-col justify-center gap-1
-                animate-fadeIn
-              `}>
-                {/* Focus Row */}
-                <div className="flex items-center gap-1 w-full justify-between">
-                  <span className="text-[8px] font-medium text-white/40 uppercase tracking-wider w-10">Focus</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleFocusChange(customFocus - 1)}
-                      className="w-5 h-5 rounded bg-white/5 border border-white/10 
-                              text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
-                              flex items-center justify-center outline-none active:scale-90 transition-all"
-                    >
-                      <Minus className="w-3 h-3" strokeWidth={1.5} />
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      max="120"
-                      value={customFocus}
-                      onChange={(e) => handleFocusChange(parseInt(e.target.value) || 1)}
-                      className="w-6 h-5 rounded bg-white/5 border border-white/10
-                              text-white text-[10px] font-medium text-center
-                              outline-none focus:outline-none focus:ring-0 selection:bg-white/20 p-0"
-                    />
-                    <button
-                      onClick={() => handleFocusChange(customFocus + 1)}
-                      className="w-5 h-5 rounded bg-white/5 border border-white/10 
-                              text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
-                              flex items-center justify-center outline-none active:scale-90 transition-all"
-                    >
-                      <Plus className="w-3 h-3" strokeWidth={1.5} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Break Row */}
-                <div className="flex items-center gap-1 w-full justify-between">
-                  <span className="text-[8px] font-medium text-white/40 uppercase tracking-wider w-10">Break</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleBreakChange(customBreak - 1)}
-                      className="w-5 h-5 rounded bg-white/5 border border-white/10 
-                              text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
-                              flex items-center justify-center outline-none active:scale-90 transition-all"
-                    >
-                      <Minus className="w-3 h-3" strokeWidth={1.5} />
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      max="60"
-                      value={customBreak}
-                      onChange={(e) => handleBreakChange(parseInt(e.target.value) || 1)}
-                      className="w-6 h-5 rounded bg-white/5 border border-white/10
-                              text-white text-[10px] font-medium text-center
-                              outline-none focus:outline-none focus:ring-0 selection:bg-white/20 p-0"
-                    />
-                    <button
-                      onClick={() => handleBreakChange(customBreak + 1)}
-                      className="w-5 h-5 rounded bg-white/5 border border-white/10 
-                              text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
-                              flex items-center justify-center outline-none active:scale-90 transition-all"
-                    >
-                      <Plus className="w-3 h-3" strokeWidth={1.5} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-  // Vertical layout for desktop (UNCHANGED)
+  // Desktop vertical layout
   return (
     <div className="flex flex-col gap-2 sm:gap-3">
       {/* Template Grid */}
