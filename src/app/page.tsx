@@ -2,14 +2,12 @@
 
 import { useTimer } from '@/hooks';
 import {
-  Header,
   TimerDisplay,
   TimerControls,
   ModeSelector,
   SessionCounter,
   SettingsPanel,
 } from '@/components';
-import { getStateGradient } from '@/lib/utils';
 
 export default function HomePage() {
   const {
@@ -30,69 +28,73 @@ export default function HomePage() {
   } = useTimer();
 
   const isTimerActive = timerStatus !== 'idle';
-  const gradientClass = getStateGradient(timerState);
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      {/* Background Effects */}
-      <div className="fixed inset-0 bg-[#0a0a0f] -z-10" />
-      
-      {/* Animated Gradient Orbs */}
+    <main className="relative min-h-screen overflow-hidden bg-[#09090b]">
+      {/* Symmetric Gradient Orbs - Horizontally Aligned */}
       <div 
         className={`
-          gradient-orb w-150 h-150 -top-50 -left-50
+          fixed left-0 top-1/2 -translate-y-1/2 -translate-x-1/2
+          w-[600px] h-[600px] rounded-full
+          blur-[120px] pointer-events-none
           transition-all duration-1000 ease-out
-          ${timerState === 'focus' ? 'gradient-orb-focus opacity-30' : 
-            timerState === 'break' ? 'gradient-orb-break opacity-30' : 'opacity-10'}
+          ${timerState === 'focus' ? 'bg-rose-500/20' : 
+            timerState === 'break' ? 'bg-emerald-500/20' : 'bg-white/5'}
         `}
-        style={{ animationDuration: '20s' }}
       />
       <div 
         className={`
-          gradient-orb w-125 h-125 -bottom-37.5 -right-37.5
-          transition-all duration-1000 ease-out animate-breathe
-          ${timerState === 'focus' ? 'gradient-orb-focus opacity-20' : 
-            timerState === 'break' ? 'gradient-orb-break opacity-20' : 'opacity-5'}
+          fixed right-0 top-1/2 -translate-y-1/2 translate-x-1/2
+          w-[600px] h-[600px] rounded-full
+          blur-[120px] pointer-events-none
+          transition-all duration-1000 ease-out
+          ${timerState === 'focus' ? 'bg-rose-500/20' : 
+            timerState === 'break' ? 'bg-emerald-500/20' : 'bg-white/5'}
         `}
       />
-      
-      {/* Grid Pattern */}
-      <div className="fixed inset-0 bg-grid-pattern opacity-30 -z-10" />
-      
-      {/* Noise Overlay */}
-      <div className="noise-overlay" />
 
-      {/* Content Container */}
-      <div className="relative z-10 flex flex-col items-center min-h-screen px-4 py-6 sm:px-6 lg:px-8">
-        {/* Header */}
-        <Header />
+      {/* Subtle Grid Pattern */}
+      <div className="fixed inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col items-center justify-center w-full max-w-4xl mx-auto py-8">
+      {/* Main Content - Three Column Layout */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-8 py-12">
+        <div className="w-full max-w-7xl flex items-center justify-between gap-8">
           
-          {/* Timer Section */}
-          <section className="w-full flex flex-col items-center mb-12">
+          {/* Left Panel - Mode Selector */}
+          <aside 
+            className={`
+              flex-shrink-0 transition-all duration-500
+              ${isTimerActive ? 'opacity-30 pointer-events-none' : 'opacity-100'}
+            `}
+          >
+            <ModeSelector
+              selectedTemplate={currentTemplate}
+              onSelectTemplate={selectTemplate}
+              onCustomDurations={setCustomDurations}
+              disabled={isTimerActive}
+            />
+          </aside>
+
+          {/* Center - Timer + Session Counter */}
+          <div className="flex flex-col items-center justify-center flex-1">
             {/* Timer Display */}
-            <div className="mb-8">
-              <TimerDisplay
-                timeRemaining={timeRemaining}
-                totalTime={totalTime}
-                timerState={timerState}
-                timerStatus={timerStatus}
-              />
+            <TimerDisplay
+              timeRemaining={timeRemaining}
+              totalTime={totalTime}
+              timerState={timerState}
+              timerStatus={timerStatus}
+            />
+
+            {/* Session Counter - Below Timer */}
+            <div className="mt-8">
+              <SessionCounter sessionsCompleted={sessionsCompleted} />
             </div>
+          </div>
 
-            {/* Current Mode Indicator (when active) */}
-            {isTimerActive && currentTemplate && (
-              <div className="mb-6 text-center animate-fadeIn">
-                <span className="text-sm text-white/40">
-                  {currentTemplate.name} • {currentTemplate.focusDuration}min focus / {currentTemplate.breakDuration}min break
-                </span>
-              </div>
-            )}
-
-            {/* Timer Controls */}
-            <div className="mb-8">
+          {/* Right Panel - Controls */}
+          <aside className="shrink-0">
+            <div className="flex flex-col gap-4">
+              {/* Timer Controls */}
               <TimerControls
                 timerStatus={timerStatus}
                 timerState={timerState}
@@ -102,42 +104,16 @@ export default function HomePage() {
                 onResume={resumeTimer}
                 onReset={resetTimer}
               />
+
+              {/* Music Toggle */}
+              <SettingsPanel
+                isMusicEnabled={isMusicEnabled}
+                onToggleMusic={toggleMusic}
+              />
             </div>
+          </aside>
 
-            {/* Settings Panel */}
-            <SettingsPanel
-              isMusicEnabled={isMusicEnabled}
-              onToggleMusic={toggleMusic}
-            />
-          </section>
-
-          {/* Mode Selector Section (collapsed when timer is running) */}
-          <section 
-            className={`
-              w-full transition-all duration-500 ease-out
-              ${isTimerActive ? 'opacity-40 scale-95 pointer-events-none' : 'opacity-100 scale-100'}
-            `}
-          >
-            <ModeSelector
-              selectedTemplate={currentTemplate}
-              onSelectTemplate={selectTemplate}
-              onCustomDurations={setCustomDurations}
-              disabled={isTimerActive}
-            />
-          </section>
-
-          {/* Session Counter */}
-          <section className="mt-12 pt-8 border-t border-white/5 w-full max-w-md">
-            <SessionCounter sessionsCompleted={sessionsCompleted} />
-          </section>
         </div>
-
-        {/* Footer */}
-        <footer className="w-full py-6 text-center">
-          <p className="text-xs text-white/30">
-            Built for deep work • No distractions, just focus
-          </p>
-        </footer>
       </div>
     </main>
   );

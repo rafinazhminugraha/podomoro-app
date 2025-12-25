@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { PomodoroTemplate } from '@/types';
-import { POMODORO_TEMPLATES, CUSTOM_TEMPLATE } from '@/data/templates';
+import { POMODORO_TEMPLATES } from '@/data/templates';
 
 interface ModeSelectorProps {
   selectedTemplate: PomodoroTemplate | null;
@@ -33,144 +33,163 @@ export function ModeSelector({
     }
   };
 
-  const handleCustomApply = () => {
-    onCustomDurations(customFocus, customBreak);
+  const handleFocusChange = (value: number) => {
+    const newValue = Math.max(1, Math.min(120, value || 1));
+    setCustomFocus(newValue);
+    if (isCustomMode) {
+      onCustomDurations(newValue, customBreak);
+    }
   };
 
+  const handleBreakChange = (value: number) => {
+    const newValue = Math.max(1, Math.min(60, value || 1));
+    setCustomBreak(newValue);
+    if (isCustomMode) {
+      onCustomDurations(customFocus, newValue);
+    }
+  };
+
+  const boxClasses = `
+    group relative rounded-xl border transition-all duration-300
+    flex items-center justify-center
+    outline-none
+    active:scale-95
+  `;
+
+  const cardClasses = `
+    rounded-xl border transition-all duration-300
+    bg-white/2 border-white/6
+  `;
+
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      {/* Section Title */}
-      <div className="text-center mb-6">
-        <h2 className="text-xl font-medium text-white/90 mb-2">Choose Your Focus Mode</h2>
-        <p className="text-sm text-white/50">Select a template or create your own</p>
-      </div>
-
+    <div className="flex flex-col gap-3">
       {/* Template Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-        {POMODORO_TEMPLATES.map((template) => (
-          <button
-            key={template.id}
-            onClick={() => handleTemplateSelect(template)}
-            disabled={disabled}
-            className={`
-              group relative p-4 rounded-2xl border transition-all duration-300
-              ${!isCustomMode && selectedTemplate?.id === template.id
-                ? 'bg-white/10 border-rose-500/50 shadow-lg shadow-rose-500/10'
-                : 'bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20'
-              }
-              ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-            `}
-          >
-            {/* Selection indicator */}
-            {!isCustomMode && selectedTemplate?.id === template.id && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full shadow-lg shadow-rose-500/50" />
-            )}
-            
-            <div className="text-center">
-              <span className="block text-sm font-medium text-white/80 mb-1">
-                {template.name}
-              </span>
-              <span className="block text-2xl font-light text-white mb-1">
-                {template.focusDuration}
-              </span>
-              <span className="block text-xs text-white/40">
-                + {template.breakDuration} min break
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
+      {POMODORO_TEMPLATES.map((template) => (
+        <button
+          key={template.id}
+          onClick={() => handleTemplateSelect(template)}
+          disabled={disabled}
+          className={`
+            ${boxClasses}
+            w-34 h-28 p-3
+            ${!isCustomMode && selectedTemplate?.id === template.id
+              ? 'bg-white/10 border-white/20'
+              : 'bg-white/2 border-white/6 hover:bg-white/5 hover:border-white/10'
+            }
+            ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
+          `}
+        >
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-xs font-medium text-white tracking-wide">
+              {template.name}
+            </span>
+            <span className="text-2xl font-light text-white tracking-tight">
+              {template.focusDuration} : {template.breakDuration}
+            </span>
+            <span className="text-xs font-medium text-white/40 tracking-wide">
+              Focus : Break
+            </span>
+          </div>
+        </button>
+      ))}
 
-      {/* Custom Mode Toggle */}
-      <div className="mt-6">
+      {/* Custom Mode - Horizontal Layout */}
+      <div className="flex items-stretch gap-2">
+        {/* Custom Button */}
         <button
           onClick={handleCustomToggle}
           disabled={disabled}
           className={`
-            w-full p-4 rounded-2xl border transition-all duration-300
+            ${boxClasses}
+            w-34 h-28 p-3
             ${isCustomMode
-              ? 'bg-white/10 border-emerald-500/50 shadow-lg shadow-emerald-500/10'
-              : 'bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20'
+              ? 'bg-white/10 border-white/20'
+              : 'bg-white/2 border-white/6 hover:bg-white/5 hover:border-white/10'
             }
-            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
           `}
         >
-          <div className="flex items-center justify-center gap-3">
-            <CustomIcon />
-            <span className="font-medium text-white/80">Custom Mode</span>
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-xs font-medium text-white tracking-wide">
+              Custom
+            </span>
+            <span className="text-2xl font-light text-white tracking-tight">
+              {customFocus} : {customBreak}
+            </span>
+            <span className="text-xs font-medium text-white/40 tracking-wide">
+              Focus : Break
+            </span>
           </div>
         </button>
 
-        {/* Custom Duration Inputs */}
+        {/* Custom Settings Card - Right Side */}
         {isCustomMode && !disabled && (
-          <div className="mt-4 p-6 rounded-2xl bg-white/5 border border-white/10 animate-fadeIn">
-            <div className="grid grid-cols-2 gap-6">
-              {/* Focus Duration */}
-              <div>
-                <label className="block text-sm text-white/60 mb-2">
-                  Focus Duration
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="1"
-                    max="120"
-                    value={customFocus}
-                    onChange={(e) => setCustomFocus(Math.max(1, Math.min(120, parseInt(e.target.value) || 1)))}
-                    className="
-                      w-full px-4 py-3 pr-16 rounded-xl
-                      bg-white/5 border border-white/10
-                      text-white text-lg font-light
-                      focus:outline-none focus:border-emerald-500/50 focus:bg-white/8
-                      transition-all duration-200
-                    "
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
-                    min
-                  </span>
-                </div>
-              </div>
-
-              {/* Break Duration */}
-              <div>
-                <label className="block text-sm text-white/60 mb-2">
-                  Break Duration
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="1"
-                    max="60"
-                    value={customBreak}
-                    onChange={(e) => setCustomBreak(Math.max(1, Math.min(60, parseInt(e.target.value) || 1)))}
-                    className="
-                      w-full px-4 py-3 pr-16 rounded-xl
-                      bg-white/5 border border-white/10
-                      text-white text-lg font-light
-                      focus:outline-none focus:border-emerald-500/50 focus:bg-white/8
-                      transition-all duration-200
-                    "
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
-                    min
-                  </span>
-                </div>
+          <div className={`${cardClasses} w-56 px-6 py-4 flex flex-col items-center justify-center gap-4 animate-fadeIn`}>
+            {/* Focus Row */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-medium text-white/50 w-10">Focus</span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handleFocusChange(customFocus - 1)}
+                  className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 
+                           text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
+                           flex items-center justify-center outline-none active:scale-90 transition-all"
+                >
+                  <MinusIcon />
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  max="120"
+                  value={customFocus}
+                  onChange={(e) => handleFocusChange(parseInt(e.target.value) || 1)}
+                  className="w-12 h-7 rounded-lg bg-white/5 border border-white/10
+                           text-white text-sm font-light text-center
+                           outline-none focus:outline-none focus:ring-0 selection:bg-white/20 caret-white/50"
+                />
+                <button
+                  onClick={() => handleFocusChange(customFocus + 1)}
+                  className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 
+                           text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
+                           flex items-center justify-center outline-none active:scale-90 transition-all"
+                >
+                  <PlusIcon />
+                </button>
               </div>
             </div>
 
-            {/* Apply Button */}
-            <button
-              onClick={handleCustomApply}
-              className="
-                w-full mt-4 py-3 rounded-xl
-                bg-emerald-500/20 text-emerald-400 font-medium
-                border border-emerald-500/30
-                hover:bg-emerald-500/30 hover:border-emerald-500/50
-                transition-all duration-200
-              "
-            >
-              Apply Custom Settings
-            </button>
+            {/* Break Row */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-medium text-white/50 w-10">Break</span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handleBreakChange(customBreak - 1)}
+                  className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 
+                           text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
+                           flex items-center justify-center outline-none active:scale-90 transition-all"
+                >
+                  <MinusIcon />
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  max="60"
+                  value={customBreak}
+                  onChange={(e) => handleBreakChange(parseInt(e.target.value) || 1)}
+                  className="w-12 h-7 rounded-lg bg-white/5 border border-white/10
+                           text-white text-sm font-light text-center
+                           outline-none focus:outline-none focus:ring-0 selection:bg-white/20 caret-white/50"
+                />
+                <button
+                  onClick={() => handleBreakChange(customBreak + 1)}
+                  className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 
+                           text-white/60 hover:bg-white/10 hover:text-white cursor-pointer
+                           flex items-center justify-center outline-none active:scale-90 transition-all"
+                >
+                  <PlusIcon />
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -178,10 +197,18 @@ export function ModeSelector({
   );
 }
 
-function CustomIcon() {
+function PlusIcon() {
   return (
-    <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v12m6-6H6" />
+    </svg>
+  );
+}
+
+function MinusIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 12H6" />
     </svg>
   );
 }
