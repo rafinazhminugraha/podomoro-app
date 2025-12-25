@@ -15,21 +15,26 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Focusly - Deep Work Pomodoro Timer',
+  title: 'Pomoductive - Deep Work Pomodoro Timer',
   description: 'A minimal, elegant Pomodoro timer designed for deep work and mental clarity. Focus better, achieve more.',
   keywords: ['pomodoro', 'timer', 'focus', 'deep work', 'productivity', 'concentration'],
-  authors: [{ name: 'Focusly' }],
-  creator: 'Focusly',
+  authors: [{ name: 'Pomoductive' }],
+  creator: 'Pomoductive',
+  icons: {
+    icon: '/img/time.png',
+    shortcut: '/img/time.png',
+    apple: '/img/time.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    title: 'Focusly - Deep Work Pomodoro Timer',
+    title: 'Pomoductive - Deep Work Pomodoro Timer',
     description: 'A minimal, elegant Pomodoro timer designed for deep work and mental clarity.',
-    siteName: 'Focusly',
+    siteName: 'Pomoductive',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Focusly - Deep Work Pomodoro Timer',
+    title: 'Pomoductive - Deep Work Pomodoro Timer',
     description: 'A minimal, elegant Pomodoro timer designed for deep work and mental clarity.',
   },
   robots: {

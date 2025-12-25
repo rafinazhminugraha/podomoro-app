@@ -142,22 +142,21 @@ export default function HomePage() {
       {/* Mobile Mode Selector - Bottom Sheet style (visible only on mobile) */}
       <div 
         className={`
-          fixed bottom-0 left-0 right-0 z-30 md:hidden
-          bg-[#09090b]/95 backdrop-blur-lg border-t border-white/10
-          transition-all duration-500
-          ${isTimerActive ? 'translate-y-full' : 'translate-y-0'}
+          fixed bottom-4 left-4 right-4 z-30 md:hidden
+          bg-transparent backdrop-blur-lg
+          transition-all duration-500 px-4
+          ${isTimerActive ? 'translate-y-[150%]' : 'translate-y-0'}
+          shadow-2xl shadow-black/50
         `}
       >
-        <div className="px-4 py-4 overflow-x-auto">
-          <div className="flex gap-3 pb-2">
-            <ModeSelector
-              selectedTemplate={currentTemplate}
-              onSelectTemplate={selectTemplate}
-              onCustomDurations={setCustomDurations}
-              disabled={isTimerActive}
-              horizontal
-            />
-          </div>
+        <div className="py-4">
+          <ModeSelector
+            selectedTemplate={currentTemplate}
+            onSelectTemplate={selectTemplate}
+            onCustomDurations={setCustomDurations}
+            disabled={isTimerActive}
+            horizontal
+          />
         </div>
       </div>
 
